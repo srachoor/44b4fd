@@ -72,6 +72,9 @@ export const logout = (id) => async (dispatch) => {
 export const fetchConversations = () => async (dispatch) => {
   try {
     const { data } = await axios.get("/api/conversations");
+    for (let item of data) {
+      item.messages.sort((a, b) => a.id - b.id);
+    }
     dispatch(gotConversations(data));
   } catch (error) {
     console.error(error);
@@ -95,15 +98,15 @@ const sendMessage = (data, body) => {
 // conversationId will be set to null if its a brand new conversation
 export const postMessage = (body) => (dispatch) => {
   try {
-    const data = saveMessage(body);
-
-    if (!body.conversationId) {
-      dispatch(addConversation(body.recipientId, data.message));
-    } else {
-      dispatch(setNewMessage(data.message));
-    }
-
-    sendMessage(data, body);
+    const promise = saveMessage(body);
+    promise.then((data) => {
+      if (!body.conversationId) {
+        dispatch(addConversation(body.recipientId, data.message));
+      } else {
+        dispatch(setNewMessage(data.message));
+        sendMessage(data, body);
+      }
+    });
   } catch (error) {
     console.error(error);
   }
