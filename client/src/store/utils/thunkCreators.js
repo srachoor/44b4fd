@@ -101,6 +101,8 @@ export const postMessage = (body) => (dispatch) => {
     const promise = saveMessage(body);
     promise.then((data) => {
       if (!body.conversationId) {
+        console.log(body)
+        console.log(data)
         dispatch(addConversation(body.recipientId, data.message));
       } else {
         dispatch(setNewMessage(data.message));

@@ -2,10 +2,7 @@ import React, { useState } from "react";
 import { FormControl, FilledInput } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import { connect } from "react-redux";
-import {
-  postMessage,
-  fetchConversations
-} from "../../store/utils/thunkCreators";
+import { postMessage } from "../../store/utils/thunkCreators";
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -23,8 +20,7 @@ const useStyles = makeStyles(() => ({
 const Input = (props) => {
   const classes = useStyles();
   const [text, setText] = useState("");
-  const { postMessage, otherUser, conversationId, user, fetchConversations } =
-    props;
+  const { postMessage, otherUser, conversationId, user } = props;
 
   const handleChange = (event) => {
     setText(event.target.value);
@@ -42,8 +38,6 @@ const Input = (props) => {
     };
     await postMessage(reqBody);
 
-    //fetching conversation again, which will trigger a refresh of the Home component's 'useEffect' method
-    await fetchConversations();
     setText("");
   };
 
@@ -68,9 +62,6 @@ const mapDispatchToProps = (dispatch) => {
     postMessage: (message) => {
       dispatch(postMessage(message));
     },
-    fetchConversations: () => {
-      dispatch(fetchConversations());
-    }
   };
 };
 
