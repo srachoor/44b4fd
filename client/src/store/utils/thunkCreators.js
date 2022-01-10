@@ -96,19 +96,18 @@ const sendMessage = (data, body) => {
 
 // message format to send: {recipientId, text, conversationId}
 // conversationId will be set to null if its a brand new conversation
-export const postMessage = (body) => (dispatch) => {
+// updated this function to be async
+export const postMessage = (body) => async (dispatch) => {
   try {
-    const promise = saveMessage(body);
-    promise.then((data) => {
-      if (!body.conversationId) {
-        console.log(body)
-        console.log(data)
-        dispatch(addConversation(body.recipientId, data.message));
-      } else {
-        dispatch(setNewMessage(data.message));
-        sendMessage(data, body);
-      }
-    });
+    const data = await saveMessage(body);
+
+    if (!body.conversationId) {
+      dispatch(addConversation(body.recipientId, await data.message));
+    } else {
+      dispatch(setNewMessage(await data.message));
+    }
+
+    sendMessage(await data, body);
   } catch (error) {
     console.error(error);
   }
