@@ -2,7 +2,7 @@
 
 Please include a summary of the changes and a link to which issue is fixed.
 
-Ticket #1: https://github.com/srachoor/44b4fd/issues/1#issue-1096811804
+Closes #1: https://github.com/srachoor/44b4fd/issues/1#issue-1096811804
 
 Summary of changes:
 1. Connected to the Database using a .env file
