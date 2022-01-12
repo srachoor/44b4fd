@@ -59,12 +59,20 @@ export const removeOfflineUserFromStore = (state, id) => {
 export const addSearchedUsersToStore = (state, users) => {
   const currentUsers = {};
 
+  console.log(state)
+  console.log(users)
+
+  const copiedState = JSON.parse(JSON.stringify(state));
+  
   // make table of current users so we can lookup faster
-  state.forEach((convo) => {
+  copiedState.forEach((convo) => {
     currentUsers[convo.otherUser.id] = true;
   });
 
-  const newState = [...state];
+  console.log(currentUsers);
+
+  const newState = JSON.parse(JSON.stringify(state));
+  // const newState = [...state];
   users.forEach((user) => {
     // only create a fake convo if we don't already have a convo with this user
     if (!currentUsers[user.id]) {
@@ -72,6 +80,7 @@ export const addSearchedUsersToStore = (state, users) => {
       newState.push(fakeConvo);
     }
   });
+  console.log(newState)
 
   return newState;
 };
