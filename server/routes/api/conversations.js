@@ -7,6 +7,7 @@ const onlineUsers = require("../../onlineUsers");
 // include other user model so we have info on username/profile pic (don't include current user info)
 router.get("/", async (req, res, next) => {
   try {
+
     if (!req.user) {
       return res.sendStatus(401);
     }
@@ -69,6 +70,18 @@ router.get("/", async (req, res, next) => {
 
       // set properties for notification count and latest message preview
       convoJSON.latestMessageText = convoJSON.messages[0].text;
+      
+      //find the number of unread messages for the current user
+      let numOfUnreadMessages = 0;
+
+      for(let j = 0; j < conversations[i].messages.length; j++) {
+        if(conversations[i].messages[j].senderId !== userId && conversations[i].messages[j].readByRecipient === false) {
+          numOfUnreadMessages++;
+        } else {
+          break;
+        }
+      }
+      convoJSON.numOfUnreadMessages = numOfUnreadMessages;
       conversations[i] = convoJSON;
     }
 
