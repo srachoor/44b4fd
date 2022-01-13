@@ -1,6 +1,10 @@
 export const addMessageToStore = (state, payload) => {
   const { message, sender } = payload;
   // if sender isn't null, that means the message needs to be put in a brand new convo
+  
+  // Need to copy the state into a completely new object, update it and return it. Can't update the state directly and return it.
+  const copiedState = JSON.parse(JSON.stringify(state));
+
   if (sender !== null) {
     const newConvo = {
       id: message.conversationId,
@@ -8,10 +12,10 @@ export const addMessageToStore = (state, payload) => {
       messages: [message],
     };
     newConvo.latestMessageText = message.text;
-    return [newConvo, ...state];
+    return [newConvo, ...copiedState];
   }
-
-  return state.map((convo) => {
+  
+  return copiedState.map((convo,index) => {
     if (convo.id === message.conversationId) {
       convo.messages.push(message);
       convo.latestMessageText = message.text;
@@ -67,7 +71,9 @@ export const addSearchedUsersToStore = (state, users) => {
 };
 
 export const addNewConvoToStore = (state, recipientId, message) => {
-  return state.map((convo) => {
+  const copiedState = JSON.parse(JSON.stringify(state));
+
+  return copiedState.map((convo) => {
     if (convo.otherUser.id === recipientId) {
       convo.id = message.conversationId;
       convo.messages.push(message);
