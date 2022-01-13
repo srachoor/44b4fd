@@ -75,7 +75,7 @@ router.get("/", async (req, res, next) => {
       let numOfUnreadMessages = 0;
 
       for(let j = 0; j < conversations[i].messages.length; j++) {
-        if(conversations[i].messages[j].senderId !== userId && conversations[i].messages[j].readByRecipient === false) {
+        if(conversations[i].messages[j].senderId !== userId && conversations[i].messages[j].isReadByRecipient === false) {
           numOfUnreadMessages++;
         } else {
           break;

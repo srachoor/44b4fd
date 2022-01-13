@@ -88,14 +88,20 @@ const saveMessage = async (body) => {
 };
 
 const sendMessage = (data, body) => {
-  console.log(data)
-  console.log(body)
   socket.emit("new-message", {
     message: data.message,
     recipientId: body.recipientId,
     sender: data.sender,
   });
 };
+
+const sendReadReceipt = (data) => {
+  
+
+  socket.emit("send-read-receipt", {
+    conversation: data
+  })
+}
 
 // message format to send: {recipientId, text, conversationId}
 // conversationId will be set to null if its a brand new conversation
@@ -109,8 +115,6 @@ export const postMessage = (body) => async (dispatch) => {
     } else {
       dispatch(setNewMessage(await data.message));
     }
-    console.log(await data);
-    console.log(body);
     sendMessage(await data, body);
   } catch (error) {
     console.error(error);
@@ -126,35 +130,30 @@ export const searchUsers = (searchTerm) => async (dispatch) => {
   }
 };
 
-// export const updateMessagesInDB = async (body) => {
-//   await axios.put("/api/messages", body)
-// }
+export const updateMessagesToDB = (conversation) => (dispatch) => {
+  //Need to create the request body and invoke updateForReadMessages from thunkcreators
+  //Draft request body here once you've updated the API post operation in the backend
+  const messagesToUpdate =  JSON.parse(JSON.stringify(conversation.messages));
 
-export const updateMessages = (conversation) => async (dispatch) => {
-
-    //Need to create the request body and invoke updateForReadMessages from thunkcreators
-    //Draft request body here once you've updated the API post operation in the backend
-    const messagesToUpdate =  JSON.parse(JSON.stringify(conversation.messages));
-    console.log(messagesToUpdate);
-    console.log(conversation);
-
-    messagesToUpdate.map((message)=> {
-      if(message.senderId !== conversation.otherUser.id) {
+  messagesToUpdate.map((message)=> {
+    if(message.senderId !== conversation.otherUser.id) {
+      return message;
+    } else {
+      if (message.isReadByRecipient === false){
+        message.isReadByRecipient = true;
         return message;
       } else {
-        if (message.readByRecipient === false){
-          message.readByRecipient = true;
-          return message;
-        } else {
-          return message;
-        }
+        return message;
       }
-    })
-    
-    console.log(messagesToUpdate);
-    const body = {messagesToUpdate}
-    // await updateMessagesInDB(body);
-    axios.put("/api/messages", body)
-    dispatch(updateForReadMessages(conversation));
+    }
+  })
+  
+  const body = {messagesToUpdate}
+  axios.put("/api/messages", body)
+  sendReadReceipt(conversation);
+} 
 
+export const updateMessages = (conversation) => async (dispatch) => {
+    dispatch(updateMessagesToDB(conversation));
+    dispatch(updateForReadMessages(conversation));
 }

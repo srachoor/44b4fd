@@ -1,9 +1,16 @@
 export const addMessageToStore = (state, payload) => {
-  const { message, sender } = payload;
+  const { message, sender, activeConversation } = payload;
   // if sender isn't null, that means the message needs to be put in a brand new convo
   
   // Need to copy the state into a completely new object, update it and return it. Can't update the state directly and return it.
   const copiedState = JSON.parse(JSON.stringify(state));
+
+  // message.conversationId;
+  const updatedConvo = copiedState.filter((convo)=> {
+    return convo.id === message.conversationId;
+  })
+
+  const updatedConvoSender = updatedConvo[0].otherUser.username;
 
   if (sender !== null) {
     const newConvo = {
@@ -23,13 +30,18 @@ export const addMessageToStore = (state, payload) => {
       if (convo.otherUser.id !== message.senderId) {
         convo.numOfUnreadMessages = 0;
       } else {
-        convo.numOfUnreadMessages++;
+        if (activeConversation === updatedConvoSender) {
+          convo.numOfUnreadMessages = 0;
+        } else {
+          convo.numOfUnreadMessages++;
+        }
       }
       return convo;
     } else {
       return convo;
     }
   });
+
 };
 
 export const addOnlineUserToStore = (state, id) => {
@@ -58,12 +70,10 @@ export const removeOfflineUserFromStore = (state, id) => {
 
 export const addSearchedUsersToStore = (state, users) => {
   const currentUsers = {};
-
   // make table of current users so we can lookup faster
   state.forEach((convo) => {
     currentUsers[convo.otherUser.id] = true;
   });
-
   const newState = [...state];
   users.forEach((user) => {
     // only create a fake convo if we don't already have a convo with this user
@@ -72,34 +82,7 @@ export const addSearchedUsersToStore = (state, users) => {
       newState.push(fakeConvo);
     }
   });
-
   return newState;
-  // const currentUsers = {};
-
-  // console.log(state)
-  // console.log(users)
-
-  // const copiedState = JSON.parse(JSON.stringify(state));
-  
-  // // make table of current users so we can lookup faster
-  // copiedState.forEach((convo) => {
-  //   currentUsers[convo.otherUser.id] = true;
-  // });
-
-  // console.log(currentUsers);
-
-  // const newState = JSON.parse(JSON.stringify(state));
-  // // const newState = [...state];
-  // users.forEach((user) => {
-  //   // only create a fake convo if we don't already have a convo with this user
-  //   if (!currentUsers[user.id]) {
-  //     let fakeConvo = { otherUser: user, messages: [] };
-  //     newState.push(fakeConvo);
-  //   }
-  // });
-  // console.log(newState)
-
-  // return newState;
 };
 
 export const addNewConvoToStore = (state, recipientId, message) => {
@@ -115,7 +98,7 @@ export const addNewConvoToStore = (state, recipientId, message) => {
   });
 };
 
-export const updateReadReceipt = (state, conversation) => {
+export const updateReadReceiptToStore = (state, conversation) => {
   const copiedState = JSON.parse(JSON.stringify(state));
   const copiedConvo = JSON.parse(JSON.stringify(conversation));  
 
@@ -123,8 +106,8 @@ export const updateReadReceipt = (state, conversation) => {
     if(copiedConvo.messages[i].senderId !== copiedConvo.otherUser.id){
       continue;
     } else {
-      if (copiedConvo.messages[i].readByRecipient === false){
-        copiedConvo.messages[i].readByRecipient = true;
+      if (copiedConvo.messages[i].isReadByRecipient === false){
+        copiedConvo.messages[i].isReadByRecipient = true;
       } else {
         break;
       }
@@ -140,3 +123,30 @@ export const updateReadReceipt = (state, conversation) => {
     }
   })
 }
+
+export const updateReadReceiptsOfOtherUserToStore= ((state, payload) => {
+  const {conversation, readRecipient, user} = payload;
+  const copiedState = JSON.parse(JSON.stringify(state));
+  const conversationId = conversation.id;
+  const currentUserId = user.id;
+
+  if(readRecipient === user.username) {
+    return copiedState.map((convo) => {
+      if (convo.id === conversationId) {
+        convo.messages.map((message) => {
+          if(message.senderId === currentUserId) {
+            message.isReadByRecipient = true;
+          }
+          return message;
+        })
+        return convo;
+      } else {
+        return convo;
+      }
+    })
+  }
+
+  return copiedState;
+
+
+})

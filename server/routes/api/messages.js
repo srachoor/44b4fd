@@ -51,7 +51,7 @@ router.put("/", async (req, res, next) => {
     const updatedMessages = req.body.messagesToUpdate;
 
     for (let i = 0; i < updatedMessages.length; i++) {
-      const updatedRead = { readByRecipient: updatedMessages[i].readByRecipient}
+      const updatedRead = { isReadByRecipient: updatedMessages[i].isReadByRecipient}
       await Message.update(updatedRead, {
         where: {
           id: updatedMessages[i].id,
