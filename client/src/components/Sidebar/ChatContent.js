@@ -62,7 +62,7 @@ const ChatContent = (props) => {
     if (activeConversation === otherUser.username){
       updateMessages(conversation)
     }
-  },[latestMessageText, activeConversation])
+  },[latestMessageText])
 
   return (
     <Box className={classes.root}>
