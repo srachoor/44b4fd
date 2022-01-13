@@ -108,9 +108,8 @@ const reducer = (state = [], action) => {
     case CLEAR_SEARCHED_USERS:
       return state.filter((convo) => convo.id);
     case ADD_CONVERSATION:
-      const copiedState = JSON.parse(JSON.stringify(state));
       return addNewConvoToStore(
-        copiedState,
+        state,
         action.payload.recipientId,
         action.payload.newMessage
       );
