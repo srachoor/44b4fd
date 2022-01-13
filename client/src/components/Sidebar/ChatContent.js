@@ -58,12 +58,6 @@ const ChatContent = (props) => {
   const { conversation, activeConversation, updateMessages } = props;
   const { latestMessageText, otherUser, numOfUnreadMessages } = conversation;
 
-  useEffect(() => {
-    if (activeConversation === otherUser.username){
-      updateMessages(conversation)
-    }
-  },[latestMessageText])
-
   return (
     <Box className={classes.root}>
       <Box>

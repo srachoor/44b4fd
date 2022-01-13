@@ -59,20 +59,12 @@ export const removeOfflineUserFromStore = (state, id) => {
 export const addSearchedUsersToStore = (state, users) => {
   const currentUsers = {};
 
-  console.log(state)
-  console.log(users)
-
-  const copiedState = JSON.parse(JSON.stringify(state));
-  
   // make table of current users so we can lookup faster
-  copiedState.forEach((convo) => {
+  state.forEach((convo) => {
     currentUsers[convo.otherUser.id] = true;
   });
 
-  console.log(currentUsers);
-
-  const newState = JSON.parse(JSON.stringify(state));
-  // const newState = [...state];
+  const newState = [...state];
   users.forEach((user) => {
     // only create a fake convo if we don't already have a convo with this user
     if (!currentUsers[user.id]) {
@@ -80,9 +72,34 @@ export const addSearchedUsersToStore = (state, users) => {
       newState.push(fakeConvo);
     }
   });
-  console.log(newState)
 
   return newState;
+  // const currentUsers = {};
+
+  // console.log(state)
+  // console.log(users)
+
+  // const copiedState = JSON.parse(JSON.stringify(state));
+  
+  // // make table of current users so we can lookup faster
+  // copiedState.forEach((convo) => {
+  //   currentUsers[convo.otherUser.id] = true;
+  // });
+
+  // console.log(currentUsers);
+
+  // const newState = JSON.parse(JSON.stringify(state));
+  // // const newState = [...state];
+  // users.forEach((user) => {
+  //   // only create a fake convo if we don't already have a convo with this user
+  //   if (!currentUsers[user.id]) {
+  //     let fakeConvo = { otherUser: user, messages: [] };
+  //     newState.push(fakeConvo);
+  //   }
+  // });
+  // console.log(newState)
+
+  // return newState;
 };
 
 export const addNewConvoToStore = (state, recipientId, message) => {

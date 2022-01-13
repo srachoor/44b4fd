@@ -126,13 +126,18 @@ export const searchUsers = (searchTerm) => async (dispatch) => {
   }
 };
 
+// export const updateMessagesInDB = async (body) => {
+//   await axios.put("/api/messages", body)
+// }
+
 export const updateMessages = (conversation) => async (dispatch) => {
 
     //Need to create the request body and invoke updateForReadMessages from thunkcreators
     //Draft request body here once you've updated the API post operation in the backend
     const messagesToUpdate =  JSON.parse(JSON.stringify(conversation.messages));
     console.log(messagesToUpdate);
-   
+    console.log(conversation);
+
     messagesToUpdate.map((message)=> {
       if(message.senderId !== conversation.otherUser.id) {
         return message;
@@ -148,6 +153,7 @@ export const updateMessages = (conversation) => async (dispatch) => {
     
     console.log(messagesToUpdate);
     const body = {messagesToUpdate}
+    // await updateMessagesInDB(body);
     axios.put("/api/messages", body)
     dispatch(updateForReadMessages(conversation));
 
