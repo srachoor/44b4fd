@@ -13,9 +13,7 @@ UserConvoBridge.belongsTo(Conversation)
 Message.belongsTo(Conversation);
 Conversation.hasMany(Message);
 Message.hasMany(ReadReceipts);
-User.hasMany(ReadReceipts);
 ReadReceipts.belongsTo(Message);
-ReadReceipts.belongsTo(User, {as: "message_recipient"});
 
 module.exports = {
   User,
