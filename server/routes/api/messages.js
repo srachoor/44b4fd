@@ -48,17 +48,28 @@ router.put("/", async (req, res, next) => {
     if (!req.user || !req.body) {
       return res.sendStatus(401);
     }
-    const updatedMessages = req.body.messagesToUpdate;
 
-    for (let i = 0; i < updatedMessages.length; i++) {
-      const updatedRead = { isReadByRecipient: updatedMessages[i].isReadByRecipient}
-      await Message.update(updatedRead, {
-        where: {
-          id: updatedMessages[i].id,
-        }
-      })
+    const conversationId = req.body.conversationId;
+    const senderId = req.body.senderId;
+    const conversation = await Conversation.findOne({
+      where: {
+        id: conversationId,
+      }
+    })
 
+    if (conversation.user1Id !== req.user.id && conversation.user2Id !== req.user.id){
+      return res.sendStatus(403);
     }
+
+    const updatedRead = { isReadByRecipient: true}
+    await Message.update(updatedRead, {
+      where: {
+        conversationId: conversationId,
+        senderId: senderId,
+      }
+    })
+
+    res.sendStatus(204)
   } catch (error) {
     next(error);
   } 

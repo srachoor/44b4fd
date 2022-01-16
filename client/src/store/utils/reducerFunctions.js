@@ -1,17 +1,7 @@
 export const addMessageToStore = (state, payload) => {
   const { message, sender, activeConversation } = payload;
-  // if sender isn't null, that means the message needs to be put in a brand new convo
   
-  // Need to copy the state into a completely new object, update it and return it. Can't update the state directly and return it.
-  const copiedState = JSON.parse(JSON.stringify(state));
-
-  // message.conversationId;
-  const updatedConvo = copiedState.filter((convo)=> {
-    return convo.id === message.conversationId;
-  })
-
-  const updatedConvoSender = updatedConvo[0].otherUser.username;
-
+  // if sender isn't null, that means the message needs to be put in a brand new convo
   if (sender !== null) {
     const newConvo = {
       id: message.conversationId,
@@ -20,28 +10,33 @@ export const addMessageToStore = (state, payload) => {
     };
     newConvo.latestMessageText = message.text;
     newConvo.numOfUnreadMessages = 1;
-    return [newConvo, ...copiedState];
+    return [newConvo, ...state];
   }
-
-  return copiedState.map((convo) => {
+    
+  // identify who the sender is of the message so that store can appropriately update the number of read messages. So if the activeConversation === the sender of the conversation, that means that the message would be automatically read 
+  
+  return state.map((convo) => {
     if (convo.id === message.conversationId) {
-      convo.messages.push(message);
-      convo.latestMessageText = message.text;
+      const convoCopy = {...convo};
+      convoCopy.messages.push(message);
+      convoCopy.latestMessageText = message.text;
       if (convo.otherUser.id !== message.senderId) {
-        convo.numOfUnreadMessages = 0;
+        convoCopy.numOfUnreadMessages = 0;
       } else {
+        const updatedConvoSender = state.filter((convo)=> {
+          return convo.id === message.conversationId;
+        })[0].otherUser.username;
         if (activeConversation === updatedConvoSender) {
-          convo.numOfUnreadMessages = 0;
+          convoCopy.numOfUnreadMessages = 0;
         } else {
-          convo.numOfUnreadMessages++;
+          convoCopy.numOfUnreadMessages++;
         }
       }
-      return convo;
+      return convoCopy;
     } else {
       return convo;
     }
   });
-
 };
 
 export const addOnlineUserToStore = (state, id) => {
@@ -86,13 +81,14 @@ export const addSearchedUsersToStore = (state, users) => {
 };
 
 export const addNewConvoToStore = (state, recipientId, message) => {
-  const copiedState = JSON.parse(JSON.stringify(state));
-  return copiedState.map((convo) => {
+  
+  return state.map((convo) => {
     if (convo.otherUser.id === recipientId) {
-      convo.id = message.conversationId;
-      convo.messages.push(message);
-      convo.latestMessageText = message.text;
-      return convo;
+      const convoCopy = {...convo};
+      convoCopy.id = message.conversationId;
+      convoCopy.messages.push(message);
+      convoCopy.latestMessageText = message.text;
+      return convoCopy;
     } else {
       return convo;
     }
@@ -100,23 +96,23 @@ export const addNewConvoToStore = (state, recipientId, message) => {
 };
 
 export const updateReadReceiptToStore = (state, conversation) => {
-  const copiedState = JSON.parse(JSON.stringify(state));
-  const copiedConvo = JSON.parse(JSON.stringify(conversation));  
+  const copiedConvo = {...conversation};
 
-  for(let i = 0; i < copiedConvo.messages.length; i++){
-    if(copiedConvo.messages[i].senderId !== copiedConvo.otherUser.id){
-      continue;
+  copiedConvo.messages.map((message) => {
+    if(message.senderId !== copiedConvo.otherUser.id) {
+      return message;
     } else {
-      if (copiedConvo.messages[i].isReadByRecipient === false){
-        copiedConvo.messages[i].isReadByRecipient = true;
+      if (message.isReadByRecipient === false) {
+        message.isReadByRecipient = true;
+        return message;
       } else {
-        break;
+        return message;
       }
     }
-  }
+  })
   copiedConvo.numOfUnreadMessages = 0;
   
-  return copiedState.map((convo)=> {
+  return state.map((convo)=> {
     if(convo.id === copiedConvo.id){
       return copiedConvo;
     } else {
@@ -125,17 +121,15 @@ export const updateReadReceiptToStore = (state, conversation) => {
   })
 }
 
-export const updateReadReceiptsOfOtherUserToStore= ((state, payload) => {
+export const updateReadReceiptsOfOtherUserToStore = ((state, payload) => {
   const {conversation, readRecipient, user} = payload;
   const copiedState = JSON.parse(JSON.stringify(state));
-  const conversationId = conversation.id;
-  const currentUserId = user.id;
 
   if(readRecipient === user.username) {
     return copiedState.map((convo) => {
-      if (convo.id === conversationId) {
+      if (convo.id === conversation.id) {
         convo.messages.map((message) => {
-          if(message.senderId === currentUserId) {
+          if(message.senderId === user.id) {
             message.isReadByRecipient = true;
           }
           return message;
@@ -146,5 +140,5 @@ export const updateReadReceiptsOfOtherUserToStore= ((state, payload) => {
       }
     })
   }
-  return copiedState;
+  return [...copiedState];
 })
