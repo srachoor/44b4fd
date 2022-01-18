@@ -130,27 +130,9 @@ export const searchUsers = (searchTerm) => async (dispatch) => {
   }
 };
 
-export const updateMessagesToDB = (conversation) => (dispatch) => {
-  //Need to create the request body and invoke updateForReadMessages from thunkcreators
-  //Draft request body here once you've updated the API post operation in the backend
-  // const messagesToUpdate =  JSON.parse(JSON.stringify(conversation.messages));
-
-  // messagesToUpdate.map((message)=> {
-  //   if(message.senderId !== conversation.otherUser.id) {
-  //     return message;
-  //   } else {
-  //     if (message.isReadByRecipient === false){
-  //       message.isReadByRecipient = true;
-  //       return message;
-  //     } else {
-  //       return message;
-  //     }
-  //   }
-  // })
-  
-  const body = {conversationId: conversation.id, senderId: conversation.otherUser.id  }
-  // const body = {messagesToUpdate}
-  axios.put("/api/messages", body)
+export const updateMessagesToDB = (conversation) => (dispatch) => {  
+  const body = {conversationId: conversation.id, senderId: conversation.otherUser.id};
+  axios.put("/api/messages", body);
   sendReadReceipt(conversation);
 } 
 

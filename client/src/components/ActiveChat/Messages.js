@@ -28,12 +28,12 @@ const Messages = (props) => {
       {messages.map((message, index) => {
         const time = moment(message.createdAt).format("h:mm");
 
-        return message.senderId === userId ? (<div key={message.id}>
+        return message.senderId === userId ? 
+        (<div key={message.id}>
           <SenderBubble text={message.text} time={time} />
-          {index === indexOfLastMessageRead ? <ReadBubble otherUser = {otherUser}></ReadBubble> : null}
-        </div>) : (
-          <OtherUserBubble key={message.id} text={message.text} time={time} otherUser={otherUser} />
-        );
+          {index === indexOfLastMessageRead && <ReadBubble otherUser = {otherUser}></ReadBubble>}
+        </div>) : 
+          <OtherUserBubble key={message.id} text={message.text} time={time} otherUser={otherUser} />;
       })}
     </Box>
   );

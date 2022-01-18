@@ -74,7 +74,7 @@ router.get("/", async (req, res, next) => {
       //find the number of unread messages for the current user
       let numOfUnreadMessages = 0;
 
-      for(let j = 0; j < conversations[i].messages.length; j++) {
+      for (let j = 0; j < conversations[i].messages.length; j++) {
         if(conversations[i].messages[j].senderId !== userId && conversations[i].messages[j].isReadByRecipient === false) {
           numOfUnreadMessages++;
         } else {

@@ -3,7 +3,7 @@ import { Box, Typography } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import { connect } from 'react-redux'
 import { updateMessagesToDB } from "../../store/utils/thunkCreators";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 const useStyles = makeStyles((props) => ({
   root: {
@@ -44,6 +44,7 @@ const useStyles = makeStyles((props) => ({
   },
   bolded:{
     color: 'black',
+    fontWeight: 'bold',
   },
   wider:{
     width: '30px',
@@ -70,8 +71,8 @@ const ChatContent = (props) => {
         <Typography className={classes.username}>
           {otherUser.username}
         </Typography>
-        <Typography className={`${classes.previewText} ${(numOfUnreadMessages > 0 && activeConversation !== otherUser.username) ? classes.bolded : ''}`}>
-          {numOfUnreadMessages > 0 ? <b>{latestMessageText}</b> : latestMessageText}
+        <Typography className={`${classes.previewText} ${(numOfUnreadMessages > 0 && activeConversation !== otherUser.username) && classes.bolded}`}>
+          {latestMessageText}
         </Typography>
       </Box>
       {(numOfUnreadMessages > 0 && activeConversation !== otherUser.username) ? (
