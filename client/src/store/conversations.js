@@ -4,7 +4,10 @@ import {
   addSearchedUsersToStore,
   removeOfflineUserFromStore,
   addMessageToStore,
+  updateReadReceiptToStore,
+  updateReadReceiptsOfOtherUserToStore
 } from "./utils/reducerFunctions";
+import store from './index'
 
 // ACTIONS
 
@@ -15,6 +18,8 @@ const REMOVE_OFFLINE_USER = "REMOVE_OFFLINE_USER";
 const SET_SEARCHED_USERS = "SET_SEARCHED_USERS";
 const CLEAR_SEARCHED_USERS = "CLEAR_SEARCHED_USERS";
 const ADD_CONVERSATION = "ADD_CONVERSATION";
+const UPDATE_READ = "UPDATE_READ"
+const UPDATE_READ_RECEIPT_OF_OTHER_USER = "UPDATE_READ_RECEIPT_OF_OTHER_USER"
 
 // ACTION CREATORS
 
@@ -25,10 +30,18 @@ export const gotConversations = (conversations) => {
   };
 };
 
+export const updateForReadMessages = (conversation) => {
+  return {
+    type: UPDATE_READ,
+    conversation,
+  };
+};
+
 export const setNewMessage = (message, sender) => {
+  
   return {
     type: SET_MESSAGE,
-    payload: { message, sender: sender || null },
+    payload: { message, sender: sender || null, activeConversation: (store.getState().activeConversation || "") },
   };
 };
 
@@ -67,12 +80,21 @@ export const addConversation = (recipientId, newMessage) => {
   };
 };
 
+export const updateReadReceiptsOfOtherUser = (conversation) => {
+  return {
+    type: UPDATE_READ_RECEIPT_OF_OTHER_USER,
+    payload: {conversation, readRecipient: conversation.otherUser.username, user: store.getState().user}
+  }
+}
+
 // REDUCER
 
 const reducer = (state = [], action) => {
   switch (action.type) {
     case GET_CONVERSATIONS:
       return action.conversations;
+    case UPDATE_READ:
+      return updateReadReceiptToStore(state, action.conversation);
     case SET_MESSAGE:
       return addMessageToStore(state, action.payload);
     case ADD_ONLINE_USER: {
@@ -91,6 +113,8 @@ const reducer = (state = [], action) => {
         action.payload.recipientId,
         action.payload.newMessage
       );
+    case UPDATE_READ_RECEIPT_OF_OTHER_USER:
+      return updateReadReceiptsOfOtherUserToStore(state, action.payload)
     default:
       return state;
   }
