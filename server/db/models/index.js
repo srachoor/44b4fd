@@ -1,24 +1,24 @@
 const Conversation = require("./conversation");
 const User = require("./user");
 const Message = require("./message");
-const UserConvoBridge = require("./userConvoBridge");
-const ReadReceipts = require("./readReceipts")
+const UserConvo = require("./userConvo");
+const ReadReceipt = require("./readReceipt")
 
 // associations
 
-User.hasMany(UserConvoBridge);
-Conversation.hasMany(UserConvoBridge);
-UserConvoBridge.belongsTo(User);
-UserConvoBridge.belongsTo(Conversation)
+User.hasMany(UserConvo);
+Conversation.hasMany(UserConvo);
+UserConvo.belongsTo(User);
+UserConvo.belongsTo(Conversation)
 Message.belongsTo(Conversation);
 Conversation.hasMany(Message);
-Message.hasMany(ReadReceipts);
-ReadReceipts.belongsTo(Message);
+Message.hasMany(ReadReceipt);
+ReadReceipt.belongsTo(Message);
 
 module.exports = {
   User,
   Conversation,
   Message,
-  UserConvoBridge,
-  ReadReceipts,
+  UserConvo,
+  ReadReceipt,
 };
